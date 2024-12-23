@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Giáng Sinh</title>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle, #020111, #000000);
+            overflow: hidden;
+            height: 100vh;
+            cursor: pointer;
+            font-family: "Arial", sans-serif;
+            color: white;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .instructions {
+            font-size: 2rem;
+            font-weight: bold;
+            z-index: 10;
+            color: #ff9671;
+            text-shadow: 1px -1px 7px rgb(142 142 142 / 80%);
+        }
+
+        .projectile {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+                0 0 30px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4);
+        }
+
+        .particule {
+            position: absolute;
+            font-size: 2rem;
+            font-family: "Cursive", serif;
+            font-weight: bold;
+            color: white;
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: white;
+            transform: scale(0);
+            opacity: 0;
+        }
+
+        .holiday-message {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff9671;
+            text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.7);
+            margin-top: 20px;
+        }
+
+        .personal-message {
+            font-size: 1.5rem;
+            color: #ff9671;
+            text-shadow: 1px 1px 5px rgba(255, 255, 255, 0.6);
+            margin-top: 20px;
+            padding: 10px;
+            font-style: italic;
+        }
+
+        /* Style for the pop-up */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            width: 70vw;
+            height: 70vh;
+            background-image: url('https://i.imgur.com/7E6cczf.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .popup h2 {
+            font-size: 2rem;
+            color: white;
+            position: absolute;
+            bottom: 20px; /* Đưa dòng chữ xuống cuối pop-up */
+            left: 50%; /* Căn giữa theo chiều ngang */
+            transform: translateX(-50%); /* Căn giữa hoàn hảo */
+            white-space: nowrap; /* Đảm bảo dòng chữ không bị ngắt thành nhiều hàng */
+        }
+        
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+        }
+
+        .close-btn:hover {
+            color: #ff9671;
+        }
+
+        /* Add some festive icons */
+        .icons {
+            font-size: 3rem;
+            margin-top: 30px;
+        }
+
+        .icons span {
+            margin: 0 10px;
+        }
+
+        /* Animation for text color change */
+        .color-change {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">Nhấn vào màn hình để xem pháo hoa!</div>
+    <div class="holiday-message">Chúc Mừng Giáng Sinh, Em Yêu!</div>
+    <div class="personal-message">
+        Mùa đông đã đến, Giáng Sinh lại về. Anh chỉ muốn nói rằng em là món quà quý giá nhất trong cuộc đời anh. <br>
+        Chúc em một Giáng Sinh thật an lành, hạnh phúc và tràn đầy yêu thương. Anh yêu em rất nhiều!
+    </div>
+
+    <!-- Pop-up content -->
+    <div class="popup" id="popup">
+        <button class="close-btn" onclick="closePopup()">X</button>
+        <h2 class="color-change">Chúc Mừng Giáng Sinh! 🎄</h2>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <script>
+        const colors = [
+            "#ff6f91",
+            "#ff9671",
+            "#ffc75f",
+            "#f9f871",
+            "#ff4c4c",
+            "#ffcc00"
+        ];
+        const letters = "I LOVE YOU";
+        let letterIndex = 0;
+
+        function getRandomLetter() {
+            const letter = letters.charAt(letterIndex);
+            letterIndex = (letterIndex + 1) % letters.length;
+            return letter;
+        }
+
+        function createFirework(x, y) {
+            const launchHeight =
+                Math.random() * (window.innerHeight / 4) + window.innerHeight / 4;
+            const projectile = document.createElement("div");
+            projectile.classList.add("projectile");
+            document.body.appendChild(projectile);
+            projectile.style.left = `${x}px`;
+            projectile.style.top = `${y}px`;
+
+            anime({
+                targets: projectile,
+                translateY: -launchHeight,
+                duration: 1200,
+                easing: "easeOutQuad",
+                complete: () => {
+                    projectile.remove();
+                    createBurst(x, y - launchHeight);
+                }
+            });
+        }
+
+        function createFireworkLine(startX, startY, numFireworks) {
+            const gap = 50;  // Khoảng cách giữa các pháo hoa
+            for (let i = 0; i < numFireworks; i++) {
+                const x = startX + (i * gap);  // Đặt vị trí pháo hoa cách nhau
+                createFirework(x, startY);
+            }
+        }
+
+        function createBurst(x, y) {
+            const numLetters = 15;
+            const numSparkles = 50;
+
+            // Letters
+            for (let i = 0; i < numLetters; i++) {
+                createParticle(x, y, false);
+            }
+
+            // Sparkles
+            for (let i = 0; i < numSparkles; i++) {
+                createParticle(x, y, true);
+            }
+        }
+
+        function createParticle(x, y, isSparkle) {
+            const el = document.createElement("div");
+            el.classList.add(isSparkle ? "sparkle" : "particule");
+            const instruction = document.querySelector('.instructions').style.display = 'none';
+
+            if (!isSparkle) {
+                el.textContent = getRandomLetter();
+                el.style.color = colors[Math.floor(Math.random() * colors.length)];
+            } else {
+                el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            document.body.appendChild(el);
+
+            animateParticle(el, isSparkle);
+        }
+
+        function animateParticle(el, isSparkle) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = anime.random(100, 200);
+            const duration = anime.random(1200, 2000);
+            const fallDistance = anime.random(20, 80);
+            const scale = isSparkle ? Math.random() * 0.5 + 0.5 : Math.random() * 1 + 0.5;
+
+            anime
+                .timeline({
+                    targets: el,
+                    easing: "easeOutCubic",
+                    duration: duration,
+                    complete: () => el.remove()
+                })
+                .add({
+                    translateX: Math.cos(angle) * distance,
+                    translateY: Math.sin(angle) * distance,
+                    scale: [0, scale],
+                    opacity: [1, 0.9]
+                })
+                .add({
+                    translateY: `+=${fallDistance}px`,
+                    opacity: [0.9, 0],
+                    easing: "easeInCubic",
+                    duration: duration / 2
+                });
+        }
+
+        document.addEventListener("click", (e) => {
+            createFirework(e.clientX, e.clientY);
+        });
+
+        window.onload = function () {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            createFirework(centerX, centerY);
+
+            // Show the popup when the page loads
+            showPopup();
+        };
+
+        function showPopup() {
+            const popup = document.getElementById("popup");
+            popup.style.display = "block";
+
+            // Start color change animation
+            anime({
+                targets: '.color-change',
+                color: ['#ff6f91', '#ffc75f', '#f9f871', '#ff4c4c'],
+                duration: 2000,
+                easing: 'easeInOutSine',
+                loop: true
+            });
+        }
+
+        function closePopup() {
+            const popup = document.getElementById("popup");
+            popup.style.display = "none";
+
+            // Bắn pháo hoa từ dưới lên và xếp theo hàng ngang
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight;
+            const numFireworks = 30; // Tăng số lượng pháo hoa lên
+            createFireworkLine(centerX - 300, centerY, numFireworks); // Điều chỉnh vị trí bắt đầu và số lượng pháo hoa
+        }
+    </script>
+</body>
+</html>
